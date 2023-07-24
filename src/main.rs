@@ -14,13 +14,17 @@ fn index() -> &'static str {
     "Navigate to http://localhost:8000/check/<type your Coin> to check  details about this crypto  !"
 }
 
+#[get("/healthz")]
+fn health() -> &'static str {
+    "healthy"
+}
+
 #[get("/check/<coin>")]
 fn check(coin: &RawStr) -> Result<String, Box<dyn std::error::Error>> {
     let request_url =format!("https://api.coingecko.com/api/v3/coins/{}", coin);
     println!("{}", request_url);
     let resp = reqwest::blocking::get(request_url)?;
     if resp.status().is_success(){
-
         Ok(format!("{} ", resp.text().unwrap()))
     }
     else{
@@ -30,5 +34,5 @@ fn check(coin: &RawStr) -> Result<String, Box<dyn std::error::Error>> {
 }
 
 fn main() {
-    rocket::ignite().mount("/", routes![index, check]).launch();
+    rocket::ignite().mount("/", routes![index, check, health]).launch();
 }
